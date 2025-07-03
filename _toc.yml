@@ -1,0 +1,7 @@
+format: jb-book
+root: content/index
+chapters:
+- file: content/syllabus
+- file: content/week01/index
+- file: content/appendices/math-review
+- file: content/appendices/python-primer

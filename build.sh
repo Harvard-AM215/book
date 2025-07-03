@@ -1,5 +1,5 @@
 # scripts/build.sh - Universal build script
-#!/bin/bash
+#!/usr/bin/env bash
 # Build script that works in any environment
 
 set -e
@@ -20,7 +20,7 @@ echo "✅ Build complete!"
 echo "📖 Open _build/html/index.html in your browser"
 
 # scripts/watch.sh - Auto-rebuild script
-#!/bin/bash
+#!/usr/bin/env bash
 # Watch for changes and auto-rebuild
 
 set -e
@@ -41,4 +41,3 @@ watchmedo shell-command \
     --command='echo "Change detected, rebuilding..." && jupyter-book build . --all && echo "✅ Rebuild complete!"' \
     --wait \
     content/
-
