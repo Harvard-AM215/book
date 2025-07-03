@@ -1,8 +1,3 @@
-# pyproject.toml - For uv users (modern Python package management)
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "am215-course-materials"
 version = "0.1.0"
@@ -10,6 +5,7 @@ description = "AM215: Advanced Scientific Computing Course Materials"
 authors = [
     {name = "Harvard University", email = "your-email@harvard.edu"},
 ]
+requires-python = ">=3.11"
 dependencies = [
     # Core MyST tools
     "jupyter-book>=0.15.1",
@@ -53,35 +49,13 @@ dev = [
     "pytest-cov>=4.0.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/your-org/am215-materials"
-Repository = "https://github.com/your-org/am215-materials"
-
 [tool.black]
 line-length = 88
 target-version = ['py311']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
 
 [tool.isort]
 profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["am215"]
+line-length = 88
 
 [tool.mypy]
 python_version = "3.11"
