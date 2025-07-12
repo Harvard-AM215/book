@@ -89,7 +89,7 @@ jobs:
           JUPYTER_CACHE: "_build/.jupyter_cache"
       
       - name: Upload artifact (GHES compatible)
-        uses: actions/upload-pages-artifact@v2  # v2 for GHES compatibility
+        uses: actions/upload-pages-artifact@v4  # v2 for GHES compatibility
         with:
           path: './_build/html'
       
