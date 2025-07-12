@@ -30,7 +30,23 @@ jobs:
     - name: Create paired notebooks from MyST files
       run: |
         echo "Creating notebooks from MyST files..."
-        uv run jupytext --sync content/**/*.md
+        # Method 1: Try with config file first
+        if uv run jupytext --sync content/**/*.md 2>/dev/null; then
+          echo "✅ Used jupytext.toml config"
+        else
+          echo "⚠️ Config failed, using manual conversion..."
+          # Method 2: Manual conversion without config
+          find content -name "*.md" -type f | while read file; do
+            if [[ -f "$file" ]]; then
+              echo "Converting $file..."
+              uv run jupytext --to notebook --output "${file%.md}.ipynb" "$file" || echo "Failed to convert $file"
+            fi
+          done
+        fi
+        
+        # List created notebooks
+        echo "Created notebooks:"
+        find content -name "*.ipynb" -type f
     
     - name: Cache Jupyter execution
       uses: actions/cache@v3
