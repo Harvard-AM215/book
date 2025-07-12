@@ -3,6 +3,7 @@ name: Deploy AM215 Book
 on:
   push:
     branches: [main]
+  workflow_dispatch:  # Allow manual triggers
 
 jobs:
   build-and-deploy:
@@ -15,18 +16,52 @@ jobs:
       with:
         python-version: '3.11'
     
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
     - name: Install uv
       run: pip install uv
     
     - name: Install dependencies
       run: uv sync
     
-    - name: Build book
-      run: uv run jupyter-book build .
+    - name: Create paired notebooks from MyST files
+      run: |
+        echo "Creating notebooks from MyST files..."
+        uv run jupytext --sync content/**/*.md
+    
+    - name: Cache Jupyter execution
+      uses: actions/cache@v3
+      with:
+        path: _build/.jupyter_cache
+        key: jupyter-book-cache-${{ hashFiles('content/**/*.md', 'content/**/*.ipynb') }}
+        restore-keys: |
+          jupyter-book-cache-
+    
+    - name: Build book with execution
+      run: |
+        echo "Building Jupyter Book 2.x with execution..."
+        uv run jupyter-book build . --all
+      env:
+        # Ensure proper execution environment
+        JUPYTER_CACHE: "_build/.jupyter_cache"
+    
+    - name: Upload build artifacts (for debugging)
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-logs
+        path: |
+          _build/
+          !_build/html/
     
     - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' && success()
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./_build/html
+        # Include .ipynb files for Colab links
+        exclude_assets: '.nojekyll'
