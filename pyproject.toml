@@ -1,3 +1,4 @@
+# pyproject.toml - Jupyter Book 2.x beta
 [project]
 name = "am215-course-materials"
 version = "0.1.0"
@@ -5,39 +6,37 @@ description = "AM215: Advanced Scientific Computing Course Materials"
 authors = [
     {name = "Harvard University", email = "your-email@harvard.edu"},
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 dependencies = [
-    # Core MyST tools
-    "jupyter-book>=0.15.1",
-    "myst-parser>=2.0.0",
-    "myst-nb>=0.17.0",
-    "sphinx>=6.0.0",
-    "sphinx-book-theme>=1.0.0",
-    "sphinx-external-toc>=0.3.0",
+    # Core Jupyter Book 2.x beta - MyST-first
+    "jupyter-book==2.0.0b1",  # Exact beta version
+    "myst-parser>=3.0.0",
+    "myst-nb>=1.0.0",
+    
+    # Sphinx - latest for 2.x compatibility
+    "sphinx>=7.0.0",
     
     # Scientific computing
     "numpy>=1.24.0",
-    "matplotlib>=3.6.0",
-    "scipy>=1.10.0",
+    "matplotlib>=3.7.0",
+    "scipy>=1.11.0",
     "sympy>=1.12.0",
     "pandas>=2.0.0",
-    "seaborn>=0.12.0",
-    "plotly>=5.14.0",
+    "seaborn>=0.13.0",
+    "plotly>=5.17.0",
     
     # Jupyter ecosystem
     "jupyter>=1.0.0",
-    "jupytext>=1.14.0",
+    "jupytext>=1.16.0",
     "ipykernel>=6.20.0",
     "ipywidgets>=8.0.0",
     
     # Development tools
     "black>=23.0.0",
-    "isort>=5.12.0",
-    "flake8>=6.0.0",
-    "mypy>=1.0.0",
+    "ruff>=0.1.0",
     
     # Additional useful packages
-    "requests>=2.28.0",
+    "requests>=2.31.0",
     "pyyaml>=6.0.0",
     "watchdog>=3.0.0",
 ]
@@ -49,16 +48,9 @@ dev = [
     "pytest-cov>=4.0.0",
 ]
 
-[tool.black]
+[tool.ruff]
 line-length = 88
-target-version = ['py311']
+target-version = "py39"
 
-[tool.isort]
-profile = "black"
-line-length = 88
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[tool.ruff.lint]
+select = ["E", "F", "I"]

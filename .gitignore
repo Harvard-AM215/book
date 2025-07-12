@@ -1,4 +1,10 @@
+# Ignore environment files
 .direnv
-.envrc
 .venv
+
+# MyST build outputs
 _build
+
+# Ignore notebooks
+*.ipynb
+.jupyter_cache/

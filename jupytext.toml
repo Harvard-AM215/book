@@ -1,0 +1,7 @@
+# jupytext.toml - Auto-pair all MyST files
+[formats]
+"content/**/*.md" = "md:myst,ipynb"
+
+[tool.jupytext]
+notebook_metadata_filter = "kernelspec"
+cell_metadata_filter = "tags,-all"

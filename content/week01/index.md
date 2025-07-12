@@ -12,5 +12,5 @@ This week introduces the fundamental concepts of scientific computing and mathem
 
 ## Materials
 
-- {doc}`lecture01`
-- {doc}`exercises`
+- [Lecture 01](lecture01)
+- [Exercises](exercises)
