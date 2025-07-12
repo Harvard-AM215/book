@@ -84,7 +84,7 @@ jobs:
         continue-on-error: true
       
       - name: Build HTML Assets
-        run: jupyter book build --html
+        run: jupyter-book build --html
         env:
           JUPYTER_CACHE: "_build/.jupyter_cache"
       
