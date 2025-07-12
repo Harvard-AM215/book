@@ -1,0 +1,83 @@
+name: Deploy AM215 Book
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install uv
+      run: pip install uv
+    
+    - name: Install dependencies
+      run: uv sync
+    
+    - name: Create paired notebooks from MyST files
+      run: |
+        echo "Creating notebooks from MyST files..."
+        if uv run jupytext --sync content/**/*.md 2>/dev/null; then
+          echo "✅ Used jupytext.toml config"
+        else
+          echo "⚠️ Config failed, using manual conversion..."
+          find content -name "*.md" -type f | while read file; do
+            if [[ -f "$file" ]]; then
+              echo "Converting $file..."
+              uv run jupytext --to notebook --output "${file%.md}.ipynb" "$file" || echo "Failed to convert $file"
+            fi
+          done
+        fi
+    
+    - name: Cache Jupyter execution
+      uses: actions/cache@v3
+      with:
+        path: _build/.jupyter_cache
+        key: jupyter-book-cache-${{ hashFiles('content/**/*.md', 'content/**/*.ipynb') }}
+        restore-keys: |
+          jupyter-book-cache-
+    
+    - name: Build book (Jupyter Book 2.x)
+      run: |
+        echo "Building Jupyter Book 2.x..."
+        uv run jupyter-book build . --all
+      env:
+        JUPYTER_CACHE: "_build/.jupyter_cache"
+    
+    - name: Build static site for deployment
+      run: |
+        echo "Building static site from JSON output..."
+        uv run jupyter-book build . --builder static
+    
+    - name: Debug build output
+      run: |
+        echo "=== Build directory structure ==="
+        ls -la _build/
+        if [ -d "_build/static" ]; then
+          echo "=== Static build contents ==="
+          ls -la _build/static/
+        fi
+        if [ -d "_build/html" ]; then
+          echo "=== HTML build contents ==="
+          ls -la _build/html/
+        fi
+    
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main' && success()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./_build/static  # Use static build for GitHub Pages

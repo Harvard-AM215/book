@@ -1,83 +1,102 @@
-name: Deploy AM215 Book
+name: Deploy AM215 Book (Jupyter Book 2.x)
 
 on:
   push:
-    branches: [main]
+    branches: [main]  # Changed from gh-pages to main
   workflow_dispatch:
 
+env:
+  BASE_URL: /${{ github.event.repository.name }}
+
+# Sets permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
 jobs:
-  build-and-deploy:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-    
-    - name: Install uv
-      run: pip install uv
-    
-    - name: Install dependencies
-      run: uv sync
-    
-    - name: Create paired notebooks from MyST files
-      run: |
-        echo "Creating notebooks from MyST files..."
-        if uv run jupytext --sync content/**/*.md 2>/dev/null; then
-          echo "✅ Used jupytext.toml config"
-        else
-          echo "⚠️ Config failed, using manual conversion..."
-          find content -name "*.md" -type f | while read file; do
-            if [[ -f "$file" ]]; then
-              echo "Converting $file..."
-              uv run jupytext --to notebook --output "${file%.md}.ipynb" "$file" || echo "Failed to convert $file"
-            fi
+      - uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install Python dependencies
+        run: uv sync
+      
+      - name: Install Jupyter Book 2.x (via npm)
+        run: npm install -g jupyter-book
+      
+      - name: Create paired notebooks from MyST files
+        run: |
+          echo "Creating notebooks from MyST files for execution and Colab..."
+          # Method 1: Try with jupytext config
+          if uv run jupytext --sync content/**/*.md 2>/dev/null; then
+            echo "✅ Used jupytext.toml config"
+          else
+            echo "⚠️ Config failed, using manual conversion..."
+            find content -name "*.md" -type f | while read file; do
+              if [[ -f "$file" ]]; then
+                echo "Converting $file..."
+                uv run jupytext --to notebook --output "${file%.md}.ipynb" "$file" || true
+              fi
+            done
+          fi
+          
+          echo "Created notebooks:"
+          find content -name "*.ipynb" -type f | head -5
+      
+      - name: Cache Jupyter execution
+        uses: actions/cache@v3
+        with:
+          path: _build/.jupyter_cache
+          key: jupyter-book-cache-${{ hashFiles('content/**/*.md', 'content/**/*.ipynb', 'myst.yml') }}
+          restore-keys: |
+            jupyter-book-cache-
+      
+      - name: Execute notebooks (if execution enabled)
+        run: |
+          echo "Executing notebooks for output generation..."
+          # Execute notebooks to generate outputs for the book
+          find content -name "*.ipynb" -type f | while read notebook; do
+            echo "Executing $notebook..."
+            uv run jupyter nbconvert --to notebook --execute --inplace "$notebook" --allow-errors || echo "Failed to execute $notebook"
           done
-        fi
-    
-    - name: Cache Jupyter execution
-      uses: actions/cache@v3
-      with:
-        path: _build/.jupyter_cache
-        key: jupyter-book-cache-${{ hashFiles('content/**/*.md', 'content/**/*.ipynb') }}
-        restore-keys: |
-          jupyter-book-cache-
-    
-    - name: Build book (Jupyter Book 2.x)
-      run: |
-        echo "Building Jupyter Book 2.x..."
-        uv run jupyter-book build . --all
-      env:
-        JUPYTER_CACHE: "_build/.jupyter_cache"
-    
-    - name: Build static site for deployment
-      run: |
-        echo "Building static site from JSON output..."
-        uv run jupyter-book build . --builder static
-    
-    - name: Debug build output
-      run: |
-        echo "=== Build directory structure ==="
-        ls -la _build/
-        if [ -d "_build/static" ]; then
-          echo "=== Static build contents ==="
-          ls -la _build/static/
-        fi
-        if [ -d "_build/html" ]; then
-          echo "=== HTML build contents ==="
-          ls -la _build/html/
-        fi
-    
-    - name: Deploy to GitHub Pages
-      if: github.ref == 'refs/heads/main' && success()
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./_build/static  # Use static build for GitHub Pages
+        continue-on-error: true  # Don't fail build if notebook execution fails
+      
+      - name: Build HTML Assets
+        run: jupyter book build --html
+        env:
+          JUPYTER_CACHE: "_build/.jupyter_cache"
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './_build/html'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
