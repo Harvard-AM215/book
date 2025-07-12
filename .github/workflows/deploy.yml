@@ -1,20 +1,18 @@
-name: Deploy AM215 Book (Jupyter Book 2.x)
+name: Deploy AM215 Book (GHES Compatible)
 
 on:
   push:
-    branches: [main]  # Changed from gh-pages to main
+    branches: [main]
   workflow_dispatch:
 
 env:
   BASE_URL: /${{ github.event.repository.name }}
 
-# Sets permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
 concurrency:
   group: 'pages'
   cancel-in-progress: false
@@ -50,53 +48,51 @@ jobs:
       - name: Install Jupyter Book 2.x (via npm)
         run: npm install -g jupyter-book
       
+      - name: Remove problematic jupytext config
+        run: |
+          echo "Removing jupytext.toml to avoid config errors..."
+          rm -f jupytext.toml
+      
       - name: Create paired notebooks from MyST files
         run: |
-          echo "Creating notebooks from MyST files for execution and Colab..."
-          # Method 1: Try with jupytext config
-          if uv run jupytext --sync content/**/*.md 2>/dev/null; then
-            echo "✅ Used jupytext.toml config"
-          else
-            echo "⚠️ Config failed, using manual conversion..."
-            find content -name "*.md" -type f | while read file; do
-              if [[ -f "$file" ]]; then
-                echo "Converting $file..."
-                uv run jupytext --to notebook --output "${file%.md}.ipynb" "$file" || true
-              fi
-            done
-          fi
+          echo "Creating notebooks from MyST files manually..."
+          find content -name "*.md" -type f | while read file; do
+            if [[ -f "$file" ]]; then
+              echo "Converting $file..."
+              uv run jupytext --to notebook --output "${file%.md}.ipynb" "$file" || echo "Failed: $file"
+            fi
+          done
           
           echo "Created notebooks:"
-          find content -name "*.ipynb" -type f | head -5
+          find content -name "*.ipynb" -type f
       
       - name: Cache Jupyter execution
-        uses: actions/cache@v3
+        uses: actions/cache@v3  # v3 for GHES compatibility
         with:
           path: _build/.jupyter_cache
-          key: jupyter-book-cache-${{ hashFiles('content/**/*.md', 'content/**/*.ipynb', 'myst.yml') }}
+          key: jupyter-book-cache-${{ hashFiles('content/**/*.md', 'content/**/*.ipynb') }}
           restore-keys: |
             jupyter-book-cache-
       
-      - name: Execute notebooks (if execution enabled)
+      - name: Execute notebooks for outputs
         run: |
-          echo "Executing notebooks for output generation..."
-          # Execute notebooks to generate outputs for the book
+          echo "Executing notebooks to generate outputs..."
           find content -name "*.ipynb" -type f | while read notebook; do
             echo "Executing $notebook..."
-            uv run jupyter nbconvert --to notebook --execute --inplace "$notebook" --allow-errors || echo "Failed to execute $notebook"
+            uv run jupyter nbconvert --to notebook --execute --inplace "$notebook" --allow-errors || echo "Failed: $notebook"
           done
-        continue-on-error: true  # Don't fail build if notebook execution fails
+        continue-on-error: true
       
       - name: Build HTML Assets
-        run: jupyter-book build --html
+        run: jupyter book build --html
         env:
           JUPYTER_CACHE: "_build/.jupyter_cache"
       
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload artifact (GHES compatible)
+        uses: actions/upload-pages-artifact@v2  # v2 for GHES compatibility
         with:
           path: './_build/html'
       
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v3  # v3 for GHES compatibility
