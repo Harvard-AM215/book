@@ -5,6 +5,5 @@
 # MyST build outputs
 _build
 
-# Ignore notebooks
-*.ipynb
+# Ignore jupyter junk
 .jupyter_cache/

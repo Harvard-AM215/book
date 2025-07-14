@@ -1,22 +1,27 @@
-name: Deploy AM215 Book (GHES Compatible)
+# This file was created automatically with `jupyter book init --gh-pages` 🪄 💚
+# Ensure your GitHub Pages settings for this repository are set to deploy with **GitHub Actions**.
 
+name: Jupyter Book (via myst) GitHub Pages Deploy
 on:
   push:
+    # Runs on pushes targeting the default branch
     branches: [main]
-  workflow_dispatch:
-
 env:
+  # `BASE_URL` determines, relative to the root of the domain, the URL that your site is served from.
+  # E.g., if your site lives at `https://mydomain.org/myproject`, set `BASE_URL=/myproject`.
+  # If, instead, your site lives at the root of the domain, at `https://mydomain.org`, set `BASE_URL=''`.
   BASE_URL: /${{ github.event.repository.name }}
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
-
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: 'pages'
   cancel-in-progress: false
-
 jobs:
   deploy:
     environment:
@@ -25,74 +30,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
       - name: Setup Pages
         uses: actions/configure-pages@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
-      
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: Install uv
-        run: pip install uv
-      
-      - name: Install Python dependencies
-        run: uv sync
-      
-      - name: Install Jupyter Book 2.x (via npm)
+      - name: Install Jupyter Book (via myst)
         run: npm install -g jupyter-book
-      
-      - name: Remove problematic jupytext config
-        run: |
-          echo "Removing jupytext.toml to avoid config errors..."
-          rm -f jupytext.toml
-      
-      - name: Create paired notebooks from MyST files
-        run: |
-          echo "Creating notebooks from MyST files manually..."
-          find content -name "*.md" -type f | while read file; do
-            if [[ -f "$file" ]]; then
-              echo "Converting $file..."
-              uv run jupytext --to notebook --output "${file%.md}.ipynb" "$file" || echo "Failed: $file"
-            fi
-          done
-          
-          echo "Created notebooks:"
-          find content -name "*.ipynb" -type f
-      
-      - name: Cache Jupyter execution
-        uses: actions/cache@v4  # v3 for GHES compatibility
-        with:
-          path: _build/.jupyter_cache
-          key: jupyter-book-cache-${{ hashFiles('content/**/*.md', 'content/**/*.ipynb') }}
-          restore-keys: |
-            jupyter-book-cache-
-      
-      - name: Execute notebooks for outputs
-        run: |
-          echo "Executing notebooks to generate outputs..."
-          find content -name "*.ipynb" -type f | while read notebook; do
-            echo "Executing $notebook..."
-            uv run jupyter nbconvert --to notebook --execute --inplace "$notebook" --allow-errors || echo "Failed: $notebook"
-          done
-        continue-on-error: true
-      
       - name: Build HTML Assets
-        run: jupyter-book build --html
-        env:
-          JUPYTER_CACHE: "_build/.jupyter_cache"
-      
-      - name: Upload artifact (GHES compatible)
-        uses: actions/upload-pages-artifact@v3  # v2 for GHES compatibility
+        run: jupyter book build --html
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: './_build/html'
-      
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4  # v3 for GHES compatibility
+        uses: actions/deploy-pages@v4
