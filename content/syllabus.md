@@ -2,9 +2,8 @@
 
 ## Course Information
 
-**Course:** AM215 - Advanced Scientific Computing  
+**Course:** AM215 - Mathematical Modeling for Computational Science\
 **Semester:** Spring 2025  
-**Credits:** 3  
 
 ## Course Description
 

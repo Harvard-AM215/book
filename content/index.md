@@ -1,4 +1,4 @@
-# AM215: Advanced Scientific Computing
+# AM215: Mathematical Modeling for Computational Science
 
 Welcome to AM215, where we explore the intersection of mathematical modeling and software development for scientific computing.
 
