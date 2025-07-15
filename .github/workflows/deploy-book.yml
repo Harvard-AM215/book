@@ -21,33 +21,31 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Set up Python, but handle caching manually for uv
+    # Set up Python
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
-    # Install uv and cache its global cache directory
+    # Cache the global uv cache
     - name: Cache uv
       uses: actions/cache@v4
       with:
         path: ~/.cache/uv
-        # Invalidate the cache if pyproject.toml changes
         key: uv-cache-${{ hashFiles('**/pyproject.toml') }}
 
-    - name: Install uv and project dependencies
+    - name: Install dependencies with uv sync
       run: |
         pip install uv
-        # Installs all dependencies from pyproject.toml into the virtual environment
-        uv pip install -p .
+        # Use `uv sync` to create an exact, reproducible environment from pyproject.toml.
+        # This is the idiomatic way to build environments for CI.
+        uv sync
 
     # (optional) Cache your executed notebooks between runs
     - name: Cache executed notebooks
       uses: actions/cache@v4
       with:
-        # IMPORTANT: The cache path must also be inside the jupyter-book directory
         path: jupyter-book/_build/.jupyter_cache
-        # The key should now be based on your project file, not requirements.txt
         key: jupyter-book-cache-${{ hashFiles('**/pyproject.toml') }}
 
     # Build the book, targeting the correct subdirectory
@@ -59,7 +57,6 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        # IMPORTANT: The path to the built assets is now inside the jupyter-book directory
         path: "jupyter-book/_build/html"
 
     # Deploy the book's HTML to GitHub Pages
