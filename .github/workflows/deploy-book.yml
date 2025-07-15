@@ -39,7 +39,7 @@ jobs:
         pip install uv
         # Use `uv sync` to create an exact, reproducible environment from pyproject.toml.
         # This is the idiomatic way to build environments for CI.
-        uv sync
+        uv pip install .
 
     # (optional) Cache your executed notebooks between runs
     - name: Cache executed notebooks
@@ -51,7 +51,7 @@ jobs:
     # Build the book, targeting the correct subdirectory
     - name: Build the book
       run: |
-        uv run jupyter-book build jupyter-book
+        jupyter-book build jupyter-book
 
     # Upload the book's HTML as an artifact
     - name: Upload artifact
