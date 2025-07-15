@@ -23,10 +23,20 @@ repository:
 
 # Add the launch buttons that should appear on each notebook page.
 launch_buttons:
-  binderhub_url: "https://mybinder.org"  # From your project.binder key
   colab_url: "https://colab.research.google.com"  # This enables the Colab button
   thebe: true  # This enables the rocket icon for live code cells
 
-# NOTE: The setting `output_matplotlib_strings: remove` from your myst.yml
-# does not have a direct equivalent in this _config.yml format. It is a
-# feature of the newer MyST-NB parser used by myst-cli.
+# --- Sphinx Configuration ---
+# This new block passes settings directly to the underlying Sphinx build process.
+sphinx:
+  config:
+    # This is the configuration dictionary for sphinx-thebe
+    thebe_config:
+      # This is the magic switch that tells Thebe to use Pyodide
+      use_lite_kernel: true
+      
+      # These are still needed so Thebe knows where to find your content
+      # if it ever needs to fall back or fetch files.
+      repository_url: "https://github.com/Harvard-AM215/book"
+      repository_branch: main
+      path_to_book: jupyter-book
