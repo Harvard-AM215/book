@@ -6,7 +6,7 @@ description = "AM215: Advanced Scientific Computing Course Materials"
 authors = [
     {name = "Harvard University", email = "your-email@harvard.edu"},
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
     # We need to use jb v1 until v2 is out of beta
     "jupyter-book>=1.0.4,<2.0.0",
@@ -16,6 +16,9 @@ dependencies = [
     # Sphinx 
     "sphinx>=7.0.0",
     "sphinx-thebe @ git+https://github.com/executablebooks/sphinx-thebe.git",
+
+    # Helpers like book server
+    "teachbooks",
 
     # Helper for live rebuild
     "watchdog>=1.0.0",
@@ -54,7 +57,7 @@ dev = [
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
