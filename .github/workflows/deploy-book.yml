@@ -7,6 +7,7 @@ on:
     paths:
     - 'jupyter-book/**'
     - 'pyproject.toml'
+    - 'requirements.txt' # Binder deps
     - '.github/workflows/deploy-book.yml'
 
 jobs:
