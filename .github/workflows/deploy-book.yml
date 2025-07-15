@@ -6,7 +6,7 @@ on:
     - main
     paths:
     - 'jupyter-book/**'
-    - 'pyproject.toml' # Also run if dependencies change
+    - 'pyproject.toml'
     - '.github/workflows/deploy-book.yml'
 
 jobs:
@@ -16,26 +16,29 @@ jobs:
       pages: write
       id-token: write
 
+    # This is the critical block that was missing.
+    # It tells GitHub that this job deploys to the standard GitHub Pages environment.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Use the official Python action to install the version specified in pyproject.toml
+    # Use the official Python action to install the version from pyproject.toml
     - name: Set up Python from pyproject.toml
       uses: actions/setup-python@v5
       with:
-        # This key tells the action to read the `requires-python` field
-        # from your pyproject.toml file.
         python-version-file: 'pyproject.toml'
 
-    # Use the official uv action to install uv and enable caching.
-    # It will automatically find and use the Python version set up in the previous step.
+    # Use the official uv action to install uv and enable caching
     - name: Install uv
       uses: astral-sh/setup-uv@v6
       with:
         enable-cache: true
 
-    # Use `uv sync` to install dependencies into the environment.
+    # Use `uv sync` to install dependencies
     - name: Install dependencies
       run: uv sync
 
@@ -46,7 +49,7 @@ jobs:
         path: jupyter-book/_build/.jupyter_cache
         key: jupyter-book-cache-${{ hashFiles('**/pyproject.toml') }}
 
-    # Use `uv run` to execute the build command within the managed environment.
+    # Use `uv run` to execute the build command
     - name: Build the book
       run: uv run jupyter-book build jupyter-book
 
