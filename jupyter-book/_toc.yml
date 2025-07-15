@@ -16,4 +16,4 @@ parts:
   - caption: Module 1
     chapters:
       - file: content/week-01/Lecture_1_Maximum_Likelihood_Estimation.ipynb
-      - file: content/week-01/Lecture_2_World_Series_Model_(Mosteller_1952)_&_Logistic_Regression.ipynb```
+      - file: content/week-01/Lecture_2_World_Series_Model_(Mosteller_1952)_&_Logistic_Regression.ipynb
