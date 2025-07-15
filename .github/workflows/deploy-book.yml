@@ -1,45 +1,43 @@
 name: deploy-book
 
-# Run this when the main branch changes, but only on changes inside the book's folder.
 on:
   push:
     branches:
     - main
     paths:
     - 'jupyter-book/**'
-    - '.github/workflows/deploy-book.yml' # Also re-run if the workflow itself changes
+    - 'pyproject.toml' # Also run if dependencies change
+    - '.github/workflows/deploy-book.yml'
 
-# This job installs dependencies, builds the book, and pushes it to `gh-pages`
 jobs:
   deploy-book:
     runs-on: ubuntu-latest
     permissions:
-      pages: write      # Required to deploy to GitHub Pages
-      id-token: write   # Required to authenticate with GitHub Pages
+      pages: write
+      id-token: write
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Set up Python
-    - name: Set up Python 3.11
+    # Use the official Python action to install the version specified in pyproject.toml
+    - name: Set up Python from pyproject.toml
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        # This key tells the action to read the `requires-python` field
+        # from your pyproject.toml file.
+        python-version-file: 'pyproject.toml'
 
-    # Cache the global uv cache
-    - name: Cache uv
-      uses: actions/cache@v4
+    # Use the official uv action to install uv and enable caching.
+    # It will automatically find and use the Python version set up in the previous step.
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
       with:
-        path: ~/.cache/uv
-        key: uv-cache-${{ hashFiles('**/pyproject.toml') }}
+        enable-cache: true
 
-    - name: Install dependencies with uv sync
-      run: |
-        pip install uv
-        # Use `uv sync` to create an exact, reproducible environment from pyproject.toml.
-        # This is the idiomatic way to build environments for CI.
-        uv pip install .
+    # Use `uv sync` to install dependencies into the environment.
+    - name: Install dependencies
+      run: uv sync
 
     # (optional) Cache your executed notebooks between runs
     - name: Cache executed notebooks
@@ -48,10 +46,9 @@ jobs:
         path: jupyter-book/_build/.jupyter_cache
         key: jupyter-book-cache-${{ hashFiles('**/pyproject.toml') }}
 
-    # Build the book, targeting the correct subdirectory
+    # Use `uv run` to execute the build command within the managed environment.
     - name: Build the book
-      run: |
-        jupyter-book build jupyter-book
+      run: uv run jupyter-book build jupyter-book
 
     # Upload the book's HTML as an artifact
     - name: Upload artifact
