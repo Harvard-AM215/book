@@ -15,6 +15,7 @@ dependencies = [
     
     # Sphinx 
     "sphinx>=7.0.0",
+    "sphinx-thebe @ git+https://github.com/executablebooks/sphinx-thebe.git",
 
     # Helper for live rebuild
     "watchdog>=1.0.0",
