@@ -51,7 +51,7 @@ jobs:
     # Build the book, targeting the correct subdirectory
     - name: Build the book
       run: |
-        jupyter-book build jupyter-book
+        uv run jupyter-book build jupyter-book
 
     # Upload the book's HTML as an artifact
     - name: Upload artifact
