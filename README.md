@@ -1,218 +1,132 @@
-# AM215: Advanced Scientific Computing Course Materials
+# AM 215: Mathematical Modeling for Computational Science
 
-This repository contains the course materials for AM215, combining mathematical modeling with software development for scientific computing.
+This repository contains the source files for the AM 215 Jupyter Book. This guide explains the development workflow for collaborators.
 
 ## Quick Start
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-org/am215-materials.git
-   cd am215-materials
-   ```
-
-2. **Run the setup script**
-   ```bash
-   ./setup.sh
-   ```
-
-3. **Start development**
-   ```bash
-   ./scripts/dev.sh
-   ```
-
-## Environment Options
-
-We support multiple development environments to accommodate different preferences and systems:
-
-### Option 1: Nix (Recommended for reproducibility)
-
-**Prerequisites:** [Nix](https://nixos.org/download.html) and [direnv](https://direnv.net/)
+For experienced developers, here is the fastest way to get started:
 
 ```bash
-# The setup script will detect Nix automatically
-./setup.sh
-direnv allow  # Automatically activates environment when entering directory
+# Clone the repository
+git clone <repository-url>
+cd <repository-name>
+
+# Create the environment and install dependencies
+uv venv
+source .venv/bin/activate
+uv sync
+
+# Start the local development server in a dedicated terminal
+./scripts/serve.sh
 ```
 
-**Benefits:**
-- Completely reproducible environment
-- Automatic activation with direnv
-- No version conflicts
-- Works identically across all systems
+## Prerequisites
 
-### Option 2: uv (Modern Python package management)
+Before you begin, ensure you have the following installed:
 
-**Prerequisites:** [uv](https://github.com/astral-sh/uv)
+1.  **Git:** For version control.
+2.  **Python 3.11+:** The project is configured to use this version.
+3.  **uv:** A fast Python package installer and resolver. If you don't have it, you can install it with `pip`:
+    ```bash
+    pip install uv
+    ```
 
-```bash
-# Install uv if not already installed
-curl -LsSf https://astral.sh/uv/install.sh | sh
+## Environment Setup
 
-# Setup will detect uv automatically
-./setup.sh
-source .venv/bin/activate  # Activate environment
-```
+This project uses `uv` and `pyproject.toml` to manage dependencies for building the book. You have two options for setting up your environment.
 
-**Benefits:**
-- Fast dependency resolution
-- Modern Python package management
-- Good compatibility with existing Python tools
+### Option 1: Standard Setup (Manual)
 
-### Option 3: Traditional venv
+This is the standard approach that will work on any system.
 
-**Prerequisites:** Python 3.11+ and pip
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd <repository-name>
+    ```
 
-```bash
-# Setup will detect Python automatically
-./setup.sh
-source .venv/bin/activate  # Activate environment
-```
+2.  **Create a virtual environment:**
+    ```bash
+    uv venv
+    ```
+    This will create a `.venv` directory in the project root.
 
-**Benefits:**
-- Works with any Python installation
-- Familiar to most Python users
-- No additional tools required
+3.  **Activate the environment:**
+    *   On macOS/Linux: `source .venv/bin/activate`
+    *   On Windows (PowerShell): `.venv\Scripts\Activate.ps1`
+
+4.  **Install dependencies:**
+    ```bash
+    uv sync
+    ```
+    This command reads `pyproject.toml` and installs all necessary packages into your virtual environment. You must have your environment activated to run this.
+
+### Option 2: Using `direnv` (Recommended)
+
+`direnv` is a tool that automatically activates and deactivates the virtual environment when you `cd` into or out of the project directory. It's a "set it and forget it" solution that makes the workflow smoother.
+
+1.  **Install `direnv`:** Follow the [official installation instructions for your operating system](https://direnv.net/docs/installation.html). Make sure to hook it into your shell.
+
+2.  **Allow the environment:** The first time you `cd` into the project directory, `direnv` will be blocked for security reasons. Run the following command to allow it:
+    ```bash
+    direnv allow .
+    ```
+    `direnv` will read the `.envrc` file and automatically create and manage the virtual environment for you.
+
+3.  **Install dependencies:** With `direnv` active, you can now run `uv sync` directly to install the project dependencies.
+    ```bash
+    uv sync
+    ```
+
+From now on, you will never need to run `source .venv/bin/activate` again; `direnv` handles it for you.
 
 ## Development Workflow
 
-### Basic Commands
+The process of adding content involves editing files, building the book, and viewing the results on a local server before pushing your changes. We recommend having **two terminal windows open** for a smooth workflow.
 
-```bash
-# Build the book
-./scripts/build.sh
+### 1. Editing and Adding Content
 
-# Watch for changes and auto-rebuild
-./scripts/watch.sh
+-   All book content (notebooks and Markdown files) lives in the `jupyter-book/content/` directory.
+-   **To edit notebooks**, activate your environment and run `jupyter lab` from the project root. This will open the familiar web-based interface for editing `.ipynb` files.
+-   After creating a new file, you **must** add its path to the table of contents to make it appear in the book. Open `jupyter-book/_toc.yml` and add the file path in the desired location.
 
-# Start full development environment (Jupyter Lab + auto-rebuild)
-./scripts/dev.sh
+### 2. Building and Serving the Book Locally
 
-# Clean build artifacts
-./scripts/clean.sh
-```
+We have created helper scripts in the `./scripts/` directory to standardize this process.
 
-### Writing Content
+-   **`./scripts/build.sh`**: This command builds the book once. The output is generated in the `jupyter-book/_build/html` directory. You will typically not need to run this directly.
+-   **`./scripts/serve.sh`**: This is the primary command for local development. **This script takes over your terminal window** to provide a live server and an interactive rebuild prompt.
 
-1. **Add new lectures** in `content/weekXX/` directories
-2. **Update table of contents** in `_toc.yml`
-3. **Add references** to `content/resources/bibliography.bib`
-4. **Include code examples** as `.py` files or Jupyter notebooks
+The recommended workflow is:
 
-### Project Structure
+1.  **In your first terminal**, run `./scripts/serve.sh`. It will:
+    -   Perform an initial build of the book.
+    -   Start a local web server to test interactive elements.
+    -   Provide a clickable link to view your book.
+    -   Wait for you to press a key to trigger the next rebuild.
 
-```
-am215-materials/
-├── content/                 # Course content
-│   ├── index.md            # Course homepage
-│   ├── syllabus.md         # Syllabus
-│   ├── week01/             # Week 1 materials
-│   │   ├── index.md        # Week overview
-│   │   ├── lecture01.md    # Lecture notes
-│   │   └── exercises.md    # Problem sets
-│   ├── appendices/         # Reference materials
-│   └── resources/          # Shared resources
-├── _config.yml             # Jupyter Book configuration
-├── _toc.yml               # Table of contents
-├── scripts/               # Build and utility scripts
-└── _build/                # Generated output (ignored)
-```
+2.  **In your second terminal**, run `git` commands, start `jupyter lab`, or use your preferred text editor to modify the source files.
 
-## MyST Features
+3.  After saving changes, return to the first terminal and **press any key** (e.g., Spacebar) to rebuild the book.
 
-This course uses MyST (Markedly Structured Text) for rich academic content:
+4.  Once the build is complete, **refresh your browser** to see the changes. The link to your book will be redisplayed in the terminal for convenience.
 
-### Code Execution
-```markdown
-# Python code that runs when building
-{code-cell} python
-import numpy as np
-import matplotlib.pyplot as plt
+5.  When you're done, press `Ctrl+C` in the first terminal to stop the server cleanly.
 
-x = np.linspace(0, 10, 100)
-y = np.sin(x)
-plt.plot(x, y)
-plt.show()
-```
+## Git Workflow and Deployment
 
-### Mathematical Equations
-```markdown
-# Inline math: $E = mc^2$
-# Block math with labels:
-{math}
-:label: euler-equation
-e^{i\pi} + 1 = 0
-```
+-   **Automatic Deployment:** Any commit pushed to the `main` branch will automatically trigger a GitHub Actions workflow that builds and deploys the latest version of the book to its public URL.
+-   **Development on Branches:** To avoid breaking the main site, all development **should be done on a separate branch**. Do not work directly on `main`.
 
-### Admonitions
-```markdown
-{note}
-This is a note for students.
-```
+The recommended Git workflow is:
+1.  Create a new branch for your feature or changes: `git checkout -b your-feature-name`
+2.  Make your edits, build and test locally, and commit your changes.
+3.  Push your branch to the remote repository: `git push origin your-feature-name`
+4.  On GitHub, open a **Pull Request** to merge your feature branch into the `main` branch. This allows for code review before deployment.
+5.  Once the Pull Request is approved and merged, the deployment workflow will run automatically.
 
-```markdown
-{warning}
-This is a warning about common mistakes.
-```
+## Important Notes & Gotchas
 
-### Cross-references
-```markdown
-See equation {eq}`euler-equation` for details.
-```
-
-## Collaboration
-
-### For Contributors
-
-1. **Create a feature branch** for your changes
-2. **Test your changes** locally with `./scripts/build.sh`
-3. **Submit a pull request** with a clear description
-
-### For Students
-
-- **Report issues** via GitHub Issues
-- **Suggest improvements** via pull requests
-- **Access latest materials** at [course website]
-
-## Deployment
-
-### GitHub Pages (Recommended)
-
-```bash
-# Deploy to GitHub Pages
-./scripts/deploy.sh
-```
-
-### Manual Deployment
-
-```bash
-# Build and copy to your web server
-./scripts/build.sh
-rsync -avz _build/html/ user@server:/path/to/webroot/
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Environment activation fails**
-   - Check that your chosen package manager is installed
-   - Run `./setup.sh` again
-
-2. **Build fails**
-   - Ensure all dependencies are installed
-   - Check for syntax errors in MyST files
-   - Run `./scripts/clean.sh` and rebuild
-
-3. **Math rendering issues**
-   - Verify MathJax configuration in `_config.yml`
-   - Check for unescaped characters in equations
-
-### Getting Help
-
-1. Check the [MyST documentation](https://myst-parser.readthedocs.io/)
-2. Review [Jupyter Book documentation](https://jupyterbook.org/)
-3. Open an issue in this repository
-
-## License
-
-This course material is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+-   **Two `requirements.txt` Files:** This project uses `pyproject.toml` for the *build environment*. The `jupyter-book/requirements.txt` file is separate and is used by **Pyodide** to install packages *into the user's browser* for the "Live Code" feature. If your notebook needs a new library for users to run in the browser, you must add it to `jupyter-book/requirements.txt`.
+-   **"Live Code" Failures:** If you find that the "Live Code" button does nothing on a specific page, the most likely cause is that the page's last cell is a code cell with no output. To fix this, simply add a new Markdown cell at the very end of the notebook.
+-   **Troubleshooting:** If you encounter strange build errors, a good first step is to delete your local virtual environment (`rm -rf .venv`) and recreate it by running `direnv allow .` (if using direnv) or `uv venv && uv sync` (if managing manually).
