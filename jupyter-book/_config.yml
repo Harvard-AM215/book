@@ -1,0 +1,32 @@
+# _config.yml
+
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: "AM 215: Mathematical Modeling for Computational Science"
+author: "" # Add your author name here if you wish
+
+# -----------------------------------------------------------------------------------
+# Settings for notebook execution
+# -----------------------------------------------------------------------------------
+execute:
+  execute_notebooks: auto  # Can be "auto", "force", "off", or "cache"
+
+# -----------------------------------------------------------------------------------
+# Settings for the book's repository and launch buttons
+# This is the correct way to configure Colab, Binder, and other launch services.
+# -----------------------------------------------------------------------------------
+repository:
+  url: https://github.com/Harvard-AM215/book  # From your project.github key
+  path_to_book: jupyter-book      # The path from your repository root to your book's root (where this file is)
+  branch: main          # The branch your book is hosted on (main, master, etc.)
+
+# Add the launch buttons that should appear on each notebook page.
+launch_buttons:
+  binderhub_url: "https://mybinder.org"  # From your project.binder key
+  colab_url: "https://colab.research.google.com"  # This enables the Colab button
+  thebe: true  # This enables the rocket icon for live code cells
+
+# NOTE: The setting `output_matplotlib_strings: remove` from your myst.yml
+# does not have a direct equivalent in this _config.yml format. It is a
+# feature of the newer MyST-NB parser used by myst-cli.

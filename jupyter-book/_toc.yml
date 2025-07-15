@@ -1,0 +1,19 @@
+# _toc.yml
+
+# This format is based directly on the official Jupyter Book documentation's _toc.yml
+# https://github.com/jupyter-book/jupyter-book/blob/main/docs/_toc.yml
+
+format: jb-book
+root: content/index
+parts:
+  - caption: Syllabus
+    chapters:
+      - file: content/syllabus.md
+  - caption: Module 0
+    chapters:
+      - file: content/week-00/Lecture_0a_Python_and_Jupyter_Basics.ipynb
+      - file: content/week-00/Lecture_0b_Review_of_Probability_Distributions.ipynb
+  - caption: Module 1
+    chapters:
+      - file: content/week-01/Lecture_1_Maximum_Likelihood_Estimation.ipynb
+      - file: content/week-01/Lecture_2_World_Series_Model_(Mosteller_1952)_&_Logistic_Regression.ipynb```
