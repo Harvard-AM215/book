@@ -1,0 +1,68 @@
+name: deploy-book
+
+# Run this when the main branch changes, but only on changes inside the book's folder.
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - 'jupyter-book/**'
+    - '.github/workflows/deploy-book.yml' # Also re-run if the workflow itself changes
+
+# This job installs dependencies, builds the book, and pushes it to `gh-pages`
+jobs:
+  deploy-book:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write      # Required to deploy to GitHub Pages
+      id-token: write   # Required to authenticate with GitHub Pages
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Set up Python, but handle caching manually for uv
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # Install uv and cache its global cache directory
+    - name: Cache uv
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/uv
+        # Invalidate the cache if pyproject.toml changes
+        key: uv-cache-${{ hashFiles('**/pyproject.toml') }}
+
+    - name: Install uv and project dependencies
+      run: |
+        pip install uv
+        # Installs all dependencies from pyproject.toml into the virtual environment
+        uv pip install -p .
+
+    # (optional) Cache your executed notebooks between runs
+    - name: Cache executed notebooks
+      uses: actions/cache@v4
+      with:
+        # IMPORTANT: The cache path must also be inside the jupyter-book directory
+        path: jupyter-book/_build/.jupyter_cache
+        # The key should now be based on your project file, not requirements.txt
+        key: jupyter-book-cache-${{ hashFiles('**/pyproject.toml') }}
+
+    # Build the book, targeting the correct subdirectory
+    - name: Build the book
+      run: |
+        jupyter-book build jupyter-book
+
+    # Upload the book's HTML as an artifact
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        # IMPORTANT: The path to the built assets is now inside the jupyter-book directory
+        path: "jupyter-book/_build/html"
+
+    # Deploy the book's HTML to GitHub Pages
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

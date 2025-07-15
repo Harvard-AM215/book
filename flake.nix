@@ -1,4 +1,4 @@
-# flake.nix - Quiet version
+# flake.nix - Include libraries for uv compatibility
 {
   description = "AM215 Course Materials";
 
@@ -19,10 +19,20 @@
         python311
         uv
         git
-        nodejs # required by juppyter-book
+        nodejs
+
+        # System libraries for Python packages
+        stdenv.cc.cc.lib
+        zlib
+        libffi
+        zeromq
       ];
 
-      # No shellHook = no output
+      shellHook = ''
+        export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib}/lib:${pkgs.libffi}/lib:${pkgs.zeromq}/lib:$LD_LIBRARY_PATH"
+        export UV_PYTHON_DOWNLOADS=never
+        export UV_PYTHON_PREFERENCE=system
+      '';
     };
   };
 }

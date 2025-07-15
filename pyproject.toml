@@ -8,13 +8,16 @@ authors = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    # Core Jupyter Book 2.x beta - MyST-first
-    "jupyter-book==2.0.0b1",  # Exact beta version
+    # We need to use jb v1 until v2 is out of beta
+    "jupyter-book>=1.0.4,<2.0.0",
     "myst-parser>=3.0.0",
     "myst-nb>=1.0.0",
     
-    # Sphinx - latest for 2.x compatibility
+    # Sphinx 
     "sphinx>=7.0.0",
+
+    # Helper for live rebuild
+    "watchdog>=1.0.0",
     
     # Scientific computing
     "numpy>=1.24.0",
