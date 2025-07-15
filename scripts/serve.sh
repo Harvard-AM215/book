@@ -1,49 +1,31 @@
 #!/usr/bin/env bash
-#
-# serve.sh
-#
-# A "live-reloading" server hack for jupyter-book v1.
-# It performs an initial build and then watches the `jupyter-book`
-# subdirectory for changes, rebuilding as needed.
-#
-# REQUIRES: `watchdog` (run `uv run pip install watchdog`)
-
-# Exit immediately if any command fails
 set -e
-
-# --- Determine paths ---
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PROJECT_ROOT=$( dirname "$SCRIPT_DIR" )
 BOOK_DIR="$PROJECT_ROOT/jupyter-book"
-
-# --- Validate that the book directory actually exists ---
-if [ ! -d "$BOOK_DIR" ]; then
-    echo "❌ Error: Book directory not found at '$BOOK_DIR'"
-    exit 1
-fi
-
-# --- Perform an Initial Build ---
-# The build.sh script will be run, showing the jupyter-book output.
+BUILD_DIR="$BOOK_DIR/_build/html"
+cleanup() {
+  echo; echo "---"; echo "🛑 Stopping TeachBooks server...";
+  uv run teachbooks serve stop > /dev/null 2>&1
+  echo "✅ Server stopped."; echo "---";
+}
+trap cleanup EXIT
 "$SCRIPT_DIR/build.sh"
-
-# --- Start the File Watcher ---
-echo "---"
-echo "✅ Initial build complete. Use the link from the output above."
-echo "👀 Watching for changes in '$BOOK_DIR'... (Press Ctrl+C to stop)"
-echo "---"
-
-# The command to run when a file changes.
-REBUILD_COMMAND="$SCRIPT_DIR/build.sh"
-
-# Use `watchmedo` to monitor the book's subdirectory.
-uv run watchmedo shell-command \
-    --command="$REBUILD_COMMAND" \
-    --patterns="*.md;*.ipynb;*.yml;*.css;*.js" \
-    --recursive \
-    --ignore-directories \
-    --ignore-patterns="*/_build/*" \
-    "$BOOK_DIR"
-
-echo "---"
-echo "✅ Watcher stopped."
-echo "---"
+echo "---"; echo "✅ Starting TeachBooks server...";
+SERVER_LOG=$(mktemp)
+uv run teachbooks serve path "$BUILD_DIR" > "$SERVER_LOG" 2>&1 &
+while ! grep -q "server running on:" "$SERVER_LOG"; do sleep 0.1; done
+BASE_URL=$(grep "server running on:" "$SERVER_LOG" | awk '{print $5}')
+FULL_URL="${BASE_URL}/index.html"
+echo; echo "✅ Server is running. Your book is available at:";
+echo "🔗 ${FULL_URL}"; echo
+while true; do
+  echo "---"
+  read -n 1 -s -r -p "👀 Press any key to rebuild the book, or Ctrl+C to exit..."
+  echo
+  "$SCRIPT_DIR/build.sh"
+  echo
+  echo "✅ Rebuild complete. Refresh your browser."
+  echo "   Your book is still available at:"
+  echo "🔗 ${FULL_URL}"
+done
