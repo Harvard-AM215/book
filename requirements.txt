@@ -1,11 +1,1 @@
-# jupyter-book/requirements.txt
-#
-# This file lists packages for Pyodide to install in the browser.
-
-numpy
-pandas
-matplotlib
-scipy
-seaborn
-statsmodels
-scikit-learn
+./jupyter-book/requirements.txt
