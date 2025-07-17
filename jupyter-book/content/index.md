@@ -1,5 +1,7 @@
 # AM215: Mathematical Modeling for Computational Science
 
+**This is just a placeholder example**
+
 Welcome to AM215, where we explore the intersection of mathematical modeling and software development for scientific computing.
 
 ## Course Overview

@@ -1,5 +1,7 @@
 # Syllabus
 
+**This is just a placeholder example**
+
 ## Course Information
 
 **Course:** AM215 - Mathematical Modeling for Computational Science\
