@@ -41,8 +41,8 @@ This is the standard approach that will work on any system.
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
-    cd <repository-name>
+    git clone git@github.com:Harvard-AM215/book.git
+    cd book
     ```
 
 2.  **Create a virtual environment:**
@@ -72,11 +72,6 @@ This is the standard approach that will work on any system.
     direnv allow .
     ```
     `direnv` will read the `.envrc` file and automatically create and manage the virtual environment for you.
-
-3.  **Install dependencies:** With `direnv` active, you can now run `uv sync` directly to install the project dependencies.
-    ```bash
-    uv sync
-    ```
 
 From now on, you will never need to run `source .venv/bin/activate` again; `direnv` handles it for you.
 
@@ -116,7 +111,7 @@ The recommended workflow is:
 ## Git Workflow and Deployment
 
 -   **Automatic Deployment:** Any commit pushed to the `main` branch will automatically trigger a GitHub Actions workflow that builds and deploys the latest version of the book to its public URL.
--   **Development on Branches:** To avoid breaking the main site, all development **should be done on a separate branch**. Do not work directly on `main`.
+-   **Development on Branches:** To avoid breaking the main site, we recommend development **on a separate branch,** rather than workng directly on `main`.
 
 The recommended Git workflow is:
 1.  Create a new branch for your feature or changes: `git checkout -b your-feature-name`
@@ -127,6 +122,12 @@ The recommended Git workflow is:
 
 ## Important Notes & Gotchas
 
--   **Two `requirements.txt` Files:** This project uses `pyproject.toml` for the *build environment*. The `jupyter-book/requirements.txt` file is separate and is used by **Pyodide** to install packages *into the user's browser* for the "Live Code" feature. If your notebook needs a new library for users to run in the browser, you must add it to `jupyter-book/requirements.txt`.
--   **"Live Code" Failures:** If you find that the "Live Code" button does nothing on a specific page, the most likely cause is that the page's last cell is a code cell with no output. To fix this, simply add a new Markdown cell at the very end of the notebook.
+-   **Two `requirements.txt` Files:** This project uses `pyproject.toml` for the *build environment*. The `jupyter-book/requirements.txt` file is separate and is used by **Pyodide** or **Binder** to install packages *into the user's browser* for the "Live Code" feature. If your notebook needs a new library for users to run in the browser, you must add it to `jupyter-book/requirements.txt`.
+-   **"Live Code" Failures:** If you find that the "Live Code" button does nothing on a specific page, the most likely cause is that the notebook have dependencies that are either missing from requirements.txt or don't work with Pyodide/Binder.
 -   **Troubleshooting:** If you encounter strange build errors, a good first step is to delete your local virtual environment (`rm -rf .venv`) and recreate it by running `direnv allow .` (if using direnv) or `uv venv && uv sync` (if managing manually).
+
+## Resources
+
+For guides, you can check out:
+- [Jupyter Book](https://jupyterbook.org/en/stable/intro.html)
+- [Myst Markdown](https://mystmd.org/)
