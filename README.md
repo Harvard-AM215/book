@@ -117,7 +117,7 @@ The recommended Git workflow is:
 1.  Create a new branch for your feature or changes: `git checkout -b your-feature-name`
 2.  Make your edits, build and test locally, and commit your changes.
 3.  Push your branch to the remote repository: `git push origin your-feature-name`
-4.  On GitHub, open a **Pull Request** to merge your feature branch into the `main` branch. This allows for code review before deployment.
+4.  On GitHub, open a **[Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)** to merge your feature branch into the `main` branch. This allows for code review before deployment.
 5.  Once the Pull Request is approved and merged, the deployment workflow will run automatically.
 
 ## Important Notes & Gotchas
