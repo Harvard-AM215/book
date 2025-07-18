@@ -2,24 +2,6 @@
 
 This repository contains the source files for the AM 215 Jupyter Book. This guide explains the development workflow for collaborators.
 
-## Quick Start
-
-For experienced developers, here is the fastest way to get started:
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd <repository-name>
-
-# Create the environment and install dependencies
-uv venv
-source .venv/bin/activate
-uv sync
-
-# Start the local development server in a dedicated terminal
-./scripts/serve.sh
-```
-
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
@@ -30,6 +12,24 @@ Before you begin, ensure you have the following installed:
     ```bash
     pip install uv
     ```
+
+## Quick Start
+
+Here is the fastest way to get started:
+
+```bash
+# Clone the repository
+git clone git@github.com:Harvard-AM215/book.git
+cd book
+
+# Create the environment and install dependencies
+uv venv
+source .venv/bin/activate
+uv sync
+
+# Start the local development server in a dedicated terminal
+./scripts/serve.sh
+```
 
 ## Environment Setup
 
