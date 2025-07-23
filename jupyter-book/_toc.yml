@@ -17,3 +17,7 @@ parts:
     chapters:
       - file: content/week-01/Lecture_1_Maximum_Likelihood_Estimation.ipynb
       - file: content/week-01/Lecture_2_World_Series_Model_(Mosteller_1952)_&_Logistic_Regression.ipynb
+  - caption: Module 2
+    chapters:
+      - file: content/week-02/[AM115_215_2024]_Lecture_3_Monte_Carlo_Methods.ipynb
+      - file: content/week-02/[AM115_215_2024]_Lecture_4_Simulating_Tournaments.ipynb
