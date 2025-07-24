@@ -19,5 +19,9 @@ parts:
       - file: content/week-01/Lecture_2_World_Series_Model_(Mosteller_1952)_&_Logistic_Regression.ipynb
   - caption: Module 2
     chapters:
-      - file: content/week-02/[AM115_215_2024]_Lecture_3_Monte_Carlo_Methods.ipynb
-      - file: content/week-02/[AM115_215_2024]_Lecture_4_Simulating_Tournaments.ipynb
+      - file: content/week-02/Lecture_3_Monte_Carlo_Methods.ipynb
+      - file: content/week-02/Lecture_4_Simulating_Tournaments.ipynb
+  - caption: Module 3
+    chapters:
+      - file: content/week-03/Lecture_5_Random_Walks.ipynb
+      - file: content/week-03/Lecture_6_Diffusion,_Geometric_Brownian_Motion.ipynb
