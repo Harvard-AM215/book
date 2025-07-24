@@ -9,3 +9,5 @@ scipy
 seaborn
 statsmodels
 scikit-learn
+nba_api
+yfinance

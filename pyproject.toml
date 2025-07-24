@@ -31,6 +31,10 @@ dependencies = [
     "pandas>=2.0.0",
     "seaborn>=0.13.0",
     "plotly>=5.17.0",
+
+    # For specific notebooks
+    "nba_api",
+    "yfinance",
     
     # Jupyter ecosystem
     "jupyter>=1.0.0",
