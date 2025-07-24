@@ -8,3 +8,6 @@ jupyter-book/_build
 # Ignore jupyter junk
 .jupyter_cache/
 .ipynb_checkpoints
+
+# teachbooks
+.teachbooks
